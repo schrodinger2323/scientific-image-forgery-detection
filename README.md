@@ -1,0 +1,133 @@
+# Scientific Image Forgery Detection
+
+Reproducible deep-learning experiments for detecting and localizing copy-move manipulation in biomedical research images. The project was developed for the **Recod.ai/LUC Scientific Image Forgery Detection** dataset and evaluates both pixel-level localization and image-level forgery detection.
+
+The repository is a compact, GitHub-ready archive of the graduation project. Datasets, model checkpoints, prediction tensors, and repeated raw experiment folders are intentionally excluded; the source code, clean notebooks, final tables, plots, and experimental report are retained.
+
+## Highlights
+
+- Leakage-safe train/validation/test splits grouped by image identity.
+- TensorFlow/Keras and PyTorch implementations in one reusable pipeline.
+- Broad screening across U-Net variants, SegFormer, DeepLabv3+, DINOv2-lite, ManTraNet, MVSSNet, BusterNet, CMFDFormer, and other forensic baselines.
+- Validation-only threshold selection and post-processing calibration.
+- Final robustness, bootstrap confidence interval, small-mask quartile, component-level, and failure-case analyses.
+- Kaggle- and Colab-compatible experiment notebooks.
+
+## Final results
+
+Two complementary 384×384 models were retained because localization quality and false-alarm control lead to different operational choices.
+
+| Model | Intended role | Forged Dice | Forged IoU | Q1 Dice | Authentic FP rate | Image F1 | ROC-AUC |
+|---|---|---:|---:|---:|---:|---:|---:|
+| SegFormer-B0 | Localization-oriented | 0.6451 | 0.4761 | 0.2767 | 0.3559 | 0.7620 | 0.8503 |
+| EfficientNetB0-UNet | Conservative / low false alarm | 0.5770 | 0.4055 | 0.2833 | 0.2394 | 0.7878 | 0.8616 |
+
+Thresholds and post-processing settings were selected on the validation split and then kept fixed for the test evaluation. See [`results/final/final_model_comparison.md`](results/final/final_model_comparison.md) and [`docs/final_experimental_report.md`](docs/final_experimental_report.md) for the full analysis.
+
+## Repository structure
+
+```text
+.
+├── src/luc_forgery_pipeline/   # Reusable data, model, training and evaluation code
+├── scripts/                    # CLI entry points for model families and comparisons
+├── experiments/                # Standalone Kaggle/Colab experiment programs
+├── notebooks/                  # Output-free notebooks ordered by study stage
+├── results/
+│   ├── eda/                    # Dataset summary tables
+│   └── final/                  # Final metrics, statistical tests and plots
+└── docs/
+    ├── workflows/              # Step-by-step records for experiments 1–6
+    └── final_experimental_report.md
+```
+
+## Dataset
+
+The data is not redistributed in this repository. Download or attach the [Recod.ai/LUC Scientific Image Forgery Detection competition data](https://www.kaggle.com/competitions/recodai-luc-scientific-image-forgery-detection) and arrange it as follows:
+
+```text
+dataset/
+├── train_images/
+│   ├── authentic/
+│   └── forged/
+├── train_masks/
+├── test_images/
+└── sample_submission.csv
+```
+
+Forged images use binary ground-truth masks; authentic images are represented by zero masks during training and evaluation.
+
+## Installation
+
+Python 3.10 or newer is recommended. The final analysis was executed with Python 3.12, PyTorch 2.10, CUDA 12.8, and an NVIDIA Tesla T4.
+
+```bash
+python -m venv .venv
+```
+
+Linux/macOS:
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
+
+Windows PowerShell:
+
+```powershell
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+pip install -e .
+```
+
+GPU builds of TensorFlow or PyTorch may require platform-specific installation steps.
+
+## Running the modular pipeline
+
+Prepare the shared split files:
+
+```bash
+python scripts/prepare_splits.py --dataset-root /path/to/dataset --output-root outputs
+```
+
+Run the initial TensorFlow models on the default balanced pilot subset:
+
+```bash
+python scripts/run_first3_models.py --dataset-root /path/to/dataset --output-root outputs
+```
+
+Run the PyTorch and forensic model groups:
+
+```bash
+python scripts/run_next3_torch_models.py --dataset-root /path/to/dataset --output-root outputs
+python scripts/run_forensic_torch_models.py --dataset-root /path/to/dataset --output-root outputs
+python scripts/run_copymove_torch_models.py --dataset-root /path/to/dataset --output-root outputs
+python scripts/run_final_cmfd_models.py --dataset-root /path/to/dataset --output-root outputs
+```
+
+Use `--help` on each script for the supported dataset, output, seed, subset, and model options. The stage-specific notebooks in [`notebooks/`](notebooks/) include path discovery for common Kaggle and Google Colab layouts.
+
+## Experimental sequence
+
+1. Screening of 15 model families on a balanced 300-authentic/300-forged pilot subset.
+2. Three-seed stability analysis for shortlisted models.
+3. Full-dataset U-Net++ analysis.
+4. Controlled comparison of four architecture families.
+5. Validation-only calibration and post-processing optimization.
+6. 384×384 small-mask localization study.
+7. Final clean-test, robustness, statistical, and failure-case evaluation of the two selected models.
+
+The complete narrative and limitations are documented in [`docs/final_experimental_report.md`](docs/final_experimental_report.md).
+
+## Reproducibility notes
+
+- The main full-data split uses seed 42 and contains 3,590 training, 515 validation, and 1,023 test images.
+- No image identity overlaps between these splits.
+- Model weights are excluded because individual checkpoints are hundreds of megabytes and can be regenerated from the included code.
+- Exact final metrics and configurations are preserved under [`results/final/`](results/final/).
+- The notebooks contain no execution outputs or embedded credentials.
+
+## Scope and limitations
+
+This is a research prototype, not a production forensic decision system. Results are specific to the Recod.ai/LUC copy-move benchmark. External-dataset validation, calibration under distribution shift, and human-review integration remain future work.
+

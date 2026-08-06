@@ -1,0 +1,14 @@
+tensorflow>=2.13
+torch
+torchvision
+transformers
+segmentation-models-pytorch
+timm
+numpy
+pandas
+scikit-learn
+scipy
+opencv-python-headless
+matplotlib
+tqdm
+tabulate

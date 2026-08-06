@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local datasets and generated outputs
+data/
+dataset/
+datasets/
+outputs/
+runs/
+checkpoints/
+wandb/
+
+# Model weights and large intermediate arrays
+*.pt
+*.pth
+*.ckpt
+*.keras
+*.h5
+*.onnx
+*.pb
+*.npz
+*.npy
+
+# Archives and temporary files
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.log
+*.tmp
+~$*
+

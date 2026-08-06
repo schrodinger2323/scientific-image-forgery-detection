@@ -1,0 +1,97 @@
+{
+  "config": {
+    "seed": 42,
+    "batch_size": 4,
+    "num_workers": 0,
+    "pin_memory": false,
+    "use_amp": true,
+    "create_submission": false,
+    "save_probability_maps": true,
+    "max_visual_examples": 12,
+    "bootstrap_iterations": 5000,
+    "robustness_enabled": true,
+    "reuse_existing_robustness_metrics": true,
+    "robustness_include_combined": true,
+    "component_iou_thresholds": [
+      0.1,
+      0.25,
+      0.5
+    ],
+    "degradation_order": [
+      "clean_png",
+      "jpeg_q90",
+      "jpeg_q70",
+      "jpeg_q50",
+      "gaussian_blur_light",
+      "gaussian_blur_medium",
+      "gaussian_noise_light",
+      "gaussian_noise_medium",
+      "combined_jpeg70_blur_light"
+    ]
+  },
+  "final_models": [
+    {
+      "name": "segformer_b0_rgb_384_smallmask",
+      "model_type": "segformer",
+      "role": "best_localization_model",
+      "preferred_strategy": "balanced_final_score",
+      "encoder_or_backbone": "nvidia/segformer-b0-finetuned-ade-512-512",
+      "image_size": 384,
+      "classes": 1,
+      "encoder_weights": null,
+      "hf_model_name": "nvidia/segformer-b0-finetuned-ade-512-512",
+      "pretrained": true
+    },
+    {
+      "name": "efficientnetb0_unet_rgb_384_smallmask",
+      "model_type": "unet",
+      "role": "low_false_alarm_model",
+      "preferred_strategy": "balanced_or_low_false_alarm",
+      "encoder_or_backbone": "efficientnet-b0",
+      "image_size": 384,
+      "classes": 1,
+      "encoder_weights": "imagenet",
+      "hf_model_name": null,
+      "pretrained": true
+    }
+  ],
+  "reference_models": [
+    {
+      "model_name": "unetpp_resnet34_rgb_full",
+      "display_name": "U-Net++ ResNet34 256",
+      "role": "256_baseline",
+      "image_size": 256,
+      "preferred_strategy": "raw_reference"
+    },
+    {
+      "model_name": "efficientnetb0_unet_rgb_full",
+      "display_name": "EfficientNetB0-UNet 256",
+      "role": "256_reference",
+      "image_size": 256,
+      "preferred_strategy": "balanced_final_score"
+    },
+    {
+      "model_name": "segformer_b0_rgb_full",
+      "display_name": "SegFormer-B0 256",
+      "role": "256_reference",
+      "image_size": 256,
+      "preferred_strategy": "balanced_final_score"
+    },
+    {
+      "model_name": "dinov2_lite_decoder_rgb_full",
+      "display_name": "DINOv2-lite 256",
+      "role": "256_reference",
+      "image_size": 256,
+      "preferred_strategy": "balanced_final_score"
+    }
+  ],
+  "paths": {
+    "dataset_root": "/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection",
+    "split_dir": "/kaggle/working/experiments_full/_shared_splits_seed42",
+    "experiments_root": "/kaggle/working/experiments_full",
+    "exp6_root": "/kaggle/working/experiments_full/experiment6_smallmask_384",
+    "exp5_root": "/kaggle/working/experiments_full/experiment5_calibration_postprocessing",
+    "exp4_root": "/kaggle/working/experiments_full",
+    "final_root": "/kaggle/working/experiments_full/final_analysis"
+  }
+}
