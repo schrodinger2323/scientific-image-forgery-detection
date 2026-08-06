@@ -128,7 +128,9 @@ Eğitim ve değerlendirme protokolü şu parametrelerle sabitlenmiştir: görün
 | MantraNet | 0,0010 | 0,0005 | 0,0500 | 0,0005 | 0,1096 | 0,4581 | 0,90 | 40 |
 | MVSSNet++ | 0,0007 | 0,0004 | 0,0167 | 0,0004 | 0,0312 | 0,4757 | 0,90 | 40 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Bu noktaya model_comparison_enriched.md verisini bar grafik olarak koyabilirsiniz: yatay eksende modeller, dikey eksende Forged Pixel F1. İlk üç modeli farklı renkte vurgulayın.
+**Deney 1 model taraması.** Turuncu çubuklar, Forged Pixel F1 ölçütünde öne çıkan üç modeli göstermektedir.
+
+![Deney 1 model taraması — Forged Pixel F1](figures/experiment1_forged_pixel_f1.png)
 
 ### 3.4 Yorum
 
@@ -152,7 +154,9 @@ Değerlendirilen beş model: Plain UNet, UNet++ (ResNet34), EfficientNetB0-UNet,
 
 Üç tohum genelinde SegFormer-B0 ve EfficientNetB0-UNet, Forged Pixel F1 sıralamasında tutarlı biçimde öne çıkmıştır. Plain UNet, tüm tohum koşullarında düşük performans göstermiş; DeepLabv3+ rekabetçi bir profil sergilemiş ancak SegFormer'ın altında kalmıştır.
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Üç tohum için model performansını gosteren kutu grafik (box plot) veya çizgi grafik ekleyin: yatay eksen model adları, dikey eksen Forged F1, üç nokta her tohumu temsil etsin. Kaynak: `deney_2/pilot_seed_comparison.csv`
+**Üç tohumda model kararlılığı.** Renkli noktalar tekil tohum sonuçlarını, büyük noktalar ve hata çubukları ise ortalama ± standart sapmayı göstermektedir.
+
+![Deney 2 üç tohum kararlılık analizi](figures/experiment2_seed_stability.png)
 
 Bu stabilite analizi iki temel kararı desteklemiştir: (a) SegFormer-B0 ve EfficientNetB0-UNet güvenilir adaylar olarak tam veri kümesine taşınacaktır; (b) Plain UNet ve alt performanslı alan-spesifik modeller elenmiştir.
 
@@ -238,7 +242,9 @@ Görüntü düzeyi hata matrisi (ham threshold, n = 1.023):
 | EfficientNetB0-UNet | 502 | 49 | 168 | 304 | 0,9111 | 0,3559 |
 | UNet++ ResNet34 | 442 | 109 | 199 | 273 | 0,8022 | 0,4216 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Görüntü düzeyi hata matrislerini 2×2 ızgara şeklinde çizin. Kaynak: `deney_4/experiments_full/` içindeki model bazlı `test_metrics_summary.csv` dosyaları.
+**Deney 4 görüntü düzeyi hata matrisleri.** Her panel aynı 1.023 görüntülük test kümesini göstermektedir.
+
+![Deney 4 görüntü düzeyi hata matrisleri](figures/experiment4_confusion_matrices.png)
 
 ### 6.3 Maske Büyüklüğüne Göre Performans
 
@@ -251,7 +257,9 @@ Görüntü düzeyi hata matrisi (ham threshold, n = 1.023):
 | SegFormer-B0 | 0,0812 | 0,2103 | **0,4249** | **0,5931** |
 | DINOv2-lite | 0,0685 | 0,1794 | 0,4197 | 0,5431 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Gruplu sütun grafik: yatay eksende Q1–Q4, her grup içinde 4 model çubuğu, dikey eksen ortalama Dice. Kaynak: `analysis_review/experiment_4_forged_area_bin_analysis.csv`
+**Maske büyüklüğüne göre lokalizasyon.** Dört model de Q1 grubunda zorlanırken maske alanı büyüdükçe ortalama Dice belirgin biçimde artmaktadır.
+
+![Deney 4 maske büyüklüğü çeyreklerine göre ortalama Dice](figures/experiment4_mask_quartiles.png)
 
 ### 6.4 İstatistiksel Karşılaştırma
 
@@ -334,11 +342,23 @@ Ağırlıklandırmanın gerekçesi: Lokalizasyon (%35) çalışmanın birincil h
 | DINOv2-lite | 0,319 | 0,305 | 0,736 | 0,803 | 546 | 5 | 16 | 456 |
 | UNet++ ResNet34 | 0,473 | 0,488 | 0,664 | 0,691 | 453 | 98 | 174 | 298 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ — deney5_rapor.md'den ŞEKİL 1]** Dört modelin stratejiye göre test metriklerini gösteren bar grafik serisi (Forged Dice, Bileşen F1, Görüntü F1, Gerçek FP Oranı).
+**Deney 5 strateji karşılaştırmaları.** Aynı post-processing stratejilerinin lokalizasyon, bileşen, görüntü sınıflandırma ve yanlış alarm ölçütlerine etkisi birlikte gösterilmiştir.
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ — deney5_rapor.md'den ŞEKİL 2]** ROC ve Kesinlik-Duyarlılık eğrileri.
+| Forged Dice | Bileşen F1 |
+|---|---|
+| ![Deney 5 stratejiye göre Forged Dice](figures/experiment5_forged_dice_by_strategy.png) | ![Deney 5 stratejiye göre bileşen F1](figures/experiment5_component_f1_by_strategy.png) |
+| Görüntü F1 | Gerçek görüntü FP oranı |
+| ![Deney 5 stratejiye göre görüntü F1](figures/experiment5_image_f1_by_strategy.png) | ![Deney 5 stratejiye göre gerçek görüntü FP oranı](figures/experiment5_authentic_fp_by_strategy.png) |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ — deney5_rapor.md'den ŞEKİL 5]** Maske büyüklük grubuna göre model performansı bar grafiği.
+**Görüntü düzeyi ayırt etme performansı.** ROC ve kesinlik-duyarlılık eğrileri, eşik seçiminden bağımsız model davranışını göstermektedir.
+
+![Deney 5 ROC eğrileri](figures/experiment5_roc_curves.png)
+
+![Deney 5 kesinlik-duyarlılık eğrileri](figures/experiment5_pr_curves.png)
+
+**Maske büyüklüğüne göre Deney 5 performansı.** Küçük maske gruplarındaki performans açığı tüm modellerde görülmektedir.
+
+![Deney 5 maske büyüklüğü gruplarına göre Dice](figures/experiment5_small_mask_comparison.png)
 
 ### 7.5 Maske Büyüklüğüne Göre Performans
 
@@ -404,7 +424,9 @@ Validation sürecinde Q1 Dice 0,30 bandına ulaşması, eğitim sırasında kü�
 | EfficientNetB0-UNet | +0,057 | **+0,267** | +0,208 | +0,096 | +0,040 | +0,048 | −113 |
 | SegFormer-B0 | +0,088 | **+0,275** | +0,235 | +0,112 | +0,112 | +0,033 | −125 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Deney 5 vs Deney 6 Q1–Q4 Dice karşılaştırmasını gruplu çubuk grafikle gösterin. Kaynak: `analysis_review/experiment_6_vs_experiment_5_reconstructed_comparison.csv`
+**Çözünürlük artışının maske çeyreklerine etkisi.** Dengeli stratejiler karşılaştırıldığında 384×384 eğitim özellikle Q1 ve Q2 gruplarında büyük kazanım sağlamaktadır.
+
+![Deney 5 ve Deney 6 Q1–Q4 Dice karşılaştırması](figures/experiment6_resolution_comparison.png)
 
 ### 8.5 Küçük Maske Trade-off Analizi
 
@@ -464,11 +486,17 @@ Final analiz, Deney 6 sonrasında seçilen iki aday modeli yeni bir eğitim yapm
 | EfficientNetB0-UNet 256 | 256 | balanced | 0,5199 | 0,3512 | — | — | 0,3251 | 0,1992 | 0,7400 | 0,7995 | 0,8446 | 0,2898 | 0,2955 |
 | UNet++ ResNet34 256 | 256 | ham ref. | 0,5092 | 0,3415 | — | — | 0,2246 | 0,6780 | 0,6985 | 0,6991 | 0,7377 | 0,3031 | 0,2742 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Altı modelin Forged Dice, Bileşen F1, Görüntü F1 ve Gerçek FP oranını gösteren gruplu çubuk grafik. Kaynak: `final_analysis/experiments_full/final_analysis/final_model_comparison.csv`
+**Final model karşılaştırması.** İyi metrikler ve düşük olması istenen gerçek görüntü FP oranı ayrı panellerde gösterilmiştir.
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** ROC ve Kesinlik-Duyarlılık eğrileri (iki final model). Kaynak: `final_analysis/experiments_full/final_analysis/plots/roc_pr_curves_final.png`
+![Final model karşılaştırması](../results/final/plots/final_model_comparison_barplots.png)
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Güven kalibrasyonu (reliability diagram). Kaynak: `final_analysis/experiments_full/final_analysis/plots/reliability_diagram_final.png`
+**İki final modelin ROC ve kesinlik-duyarlılık eğrileri.**
+
+![Final modellerin ROC ve kesinlik-duyarlılık eğrileri](../results/final/plots/roc_pr_curves_final.png)
+
+**Güven kalibrasyonu.** Kesikli köşegen kusursuz kalibrasyonu temsil etmektedir.
+
+![Final modellerin güven kalibrasyonu](../results/final/plots/reliability_diagram_final.png)
 
 ### 9.5 Küçük Maske (Q1–Q4) Analizi
 
@@ -485,9 +513,13 @@ Final analiz, Deney 6 sonrasında seçilen iki aday modeli yeni bir eğitim yapm
 | EfficientNetB0-UNet 384 | Q3 | 137 | 0,4127 | 0,4821 | 0,2990 | 0,3176 | 33 |
 | EfficientNetB0-UNet 384 | Q4 | 138 | 0,5685 | 0,5737 | 0,4320 | 0,4022 | 11 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Q1–Q4 grubuna göre iki final modelin ortalama Dice değerlerini gösteren yan yana çubuk grafik. Kaynak: `final_analysis/experiments_full/final_analysis/plots/small_mask_quartile_final.png`
+**Final modellerin Q1–Q4 performansı.**
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Per-image Dice dağılımını gösteren violin veya kutu grafiği. Kaynak: `final_analysis/experiments_full/final_analysis/plots/per_image_dice_distribution.png`
+![Final modellerin maske büyüklüğüne göre Dice değerleri](../results/final/plots/small_mask_quartile_final.png)
+
+**Görüntü başına Dice dağılımı.** Dağılım grafiği, ortalama değerlerin arkasındaki vaka çeşitliliğini göstermektedir.
+
+![Final modellerin görüntü başına Dice dağılımı](../results/final/plots/per_image_dice_distribution.png)
 
 Q1 grubunda ortalama Dice değerleri her iki model için de yaklaşık 0,28 düzeyindedir ve Q1 vakalarının yaklaşık yarısı (65 ve 64 vaka) Dice < 0,05 eşiğinin altında kalmaktadır. Bu, 384×384 çözünürlük artışının Q1 sorununu belirgin biçimde hafiflettiğini ancak tamamen çözmediğini göstermektedir. Maske alanı büyüdükçe başarı belirgin biçimde artmakta; SegFormer-B0 384 Q4'te 0,6922 ortalama ve 0,7363 medyan Dice üretmektedir.
 
@@ -525,7 +557,9 @@ Bozulma koşulları: JPEG Q90, JPEG Q70, JPEG Q50, Gaussian blur light (3×3, si
 | Noise medium | 0,5442 | 0,1371 | 0,3397 | 0,3686 | 0,7335 | 0,7548 |
 | JPEG70 + Blur light | 0,5749 | 0,1665 | 0,3930 | 0,2267 | 0,7732 | 0,8360 |
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Bozulma koşullarına göre Forged Dice, Q1 Dice, Gerçek FP oranı ve Bileşen F1 çizgi grafikleri (her metrik için ayrı panel, iki model aynı grafikte). Kaynak: `final_analysis/experiments_full/final_analysis/plots/` içindeki `robustness_*.png` dosyaları.
+**Robustness özeti.** Dört panel, aynı bozulma koşullarında iki final modelin Forged Dice, Q1 Dice, gerçek görüntü FP oranı ve bileşen F1 değişimini birlikte göstermektedir.
+
+![Final modellerin robustness özeti](figures/final_robustness_small_multiples.png)
 
 **Robustness yorumu:** JPEG sıkıştırma ve gürültü bozulmaları Q1 küçük maskelerde en sert düşüşü üretmektedir. SegFormer-B0 384 aggregate Forged Dice açısından bozulmalara daha dayanıklı görünmektedir; ancak gürültü medium koşulunda gerçek FP oranı 0,5148'e yükselir. EfficientNetB0-UNet 384, temiz ve pek çok bozulma koşulunda daha düşük gerçek FP oranını korur; buna karşın Q1 Dice, JPEG Q70/Q50 ve birleşik koşullarda daha sert düşer. Hafif bulanıklık (blur light) her iki modelin Forged Dice'ını clean koşuluna göre hafif artırmakta; bu, hafif düzleşmenin keskin sınır piksellerindeki gürültüyü azalttığını ve bazı vakalarda maskenin daha düzgün segmentasyonuna yardımcı olduğunu düşündürmektedir.
 
@@ -569,11 +603,17 @@ Her final model için 7 failure/success grubu oluşturulmuştur (her grupta en f
 
 Model anlaşmazlık analizi: SegFormer'ın EfficientNet'e göre çok daha iyi performans gösterdiği 12 ve EfficientNet'in SegFormer'a göre çok daha iyi olduğu 12 vaka ayrı olarak incelenmiştir. En büyük SegFormer lehine Dice farkı +0,8976; en büyük EfficientNet lehine fark −0,7144'tür.
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Failure case örneklerini orijinal görüntü + ground truth maske + model tahmin maskesi üçlüsü şeklinde grid görsel olarak ekleyin. Kaynak: `final_analysis/experiments_full/final_analysis/segformer_b0_rgb_384_smallmask/failure_cases/` ve `efficientnetb0_unet_rgb_384_smallmask/failure_cases/` klasörleri.
+**Tipik başarı ve hata vakaları.** Sütunlar sırasıyla orijinal görüntüyü, ground-truth maskeyi, SegFormer olasılık/tahminini ve EfficientNet olasılık/tahminini göstermektedir.
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Model anlaşmazlık vakası örnekleri. Kaynak: `final_analysis/experiments_full/final_analysis/plots/model_disagreement_examples.png`
+![Final analiz başarı ve hata vakaları](figures/final_failure_case_examples.png)
 
-> **[GÖRSELLEŞTİRME ÖNERİSİ]** Hata matrisleri (iki final model). Kaynak: `final_analysis/experiments_full/final_analysis/plots/confusion_matrices_final.png`
+**Model anlaşmazlık örnekleri.** Bu panel, iki modelin en fazla ayrıştığı vakaları karşılaştırmaktadır.
+
+![Final modellerin anlaşmazlık örnekleri](../results/final/plots/model_disagreement_examples.png)
+
+**İki final modelin görüntü düzeyi hata matrisleri.**
+
+![Final modellerin görüntü düzeyi hata matrisleri](../results/final/plots/confusion_matrices_final.png)
 
 ---
 
