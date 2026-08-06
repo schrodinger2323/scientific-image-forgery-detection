@@ -356,9 +356,7 @@ Ağırlıklandırmanın gerekçesi: Lokalizasyon (%35) çalışmanın birincil h
 
 ![Deney 5 kesinlik-duyarlılık eğrileri](figures/experiment5_pr_curves.png)
 
-**Maske büyüklüğüne göre Deney 5 performansı.** Küçük maske gruplarındaki performans açığı tüm modellerde görülmektedir.
-
-![Deney 5 maske büyüklüğü gruplarına göre Dice](figures/experiment5_small_mask_comparison.png)
+**Maske büyüklüğüne göre Deney 5 performansı.** Küçük maske gruplarındaki performans açığı tüm modellerde görülmüştür.
 
 ### 7.5 Maske Büyüklüğüne Göre Performans
 
