@@ -24,6 +24,20 @@ Two complementary 384×384 models were retained because localization quality and
 
 Thresholds and post-processing settings were selected on the validation split and then kept fixed for the test evaluation. See [`results/final/final_model_comparison.md`](results/final/final_model_comparison.md) and [`docs/final_experimental_report.md`](docs/final_experimental_report.md) for the full analysis.
 
+## Visual overview
+
+The study progressively narrows a broad architecture screening into a controlled comparison, post-processing study, higher-resolution small-mask experiment, and final robustness analysis.
+
+![Experimental process from screening to final analysis](docs/figures/experimental_process.png)
+
+The final candidates expose a clear operational trade-off: SegFormer-B0 leads localization metrics, while EfficientNetB0-UNet provides stronger false-alarm control and image-level performance.
+
+![Final model comparison](results/final/plots/final_model_comparison_barplots.png)
+
+Small forged regions remain the hardest cases, although 384×384 training substantially improves the Q1 and Q2 groups.
+
+![Small-mask quartile comparison](results/final/plots/small_mask_quartile_final.png)
+
 ## Repository structure
 
 ```text
@@ -130,4 +144,3 @@ The complete narrative and limitations are documented in [`docs/final_experiment
 ## Scope and limitations
 
 This is a research prototype, not a production forensic decision system. Results are specific to the Recod.ai/LUC copy-move benchmark. External-dataset validation, calibration under distribution shift, and human-review integration remain future work.
-
