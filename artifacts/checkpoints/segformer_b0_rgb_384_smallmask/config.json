@@ -1,0 +1,19 @@
+{
+  "name": "segformer_b0_rgb_384_smallmask",
+  "model_type": "segformer",
+  "model_family": "transformer semantic segmentation",
+  "encoder_or_backbone": "nvidia/segformer-b0-finetuned-ade-512-512",
+  "input_mode": "rgb",
+  "image_size": 384,
+  "classes": 1,
+  "encoder_weights": null,
+  "hf_model_name": "nvidia/segformer-b0-finetuned-ade-512-512",
+  "pretrained": true,
+  "epochs": 40,
+  "learning_rate": 0.0001,
+  "weight_decay": 0.0001,
+  "use_pos_weight": true,
+  "use_small_mask_oversampling": false,
+  "use_small_mask_loss_weight": false,
+  "enabled": true
+}

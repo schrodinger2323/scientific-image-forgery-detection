@@ -1,0 +1,3 @@
+model_name,checkpoint_found,message,checkpoint_path,total_parameters,trainable_params
+segformer_b0_rgb_384_smallmask,True,,/kaggle/working/experiments_full/experiment6_smallmask_384/segformer_b0_rgb_384_smallmask/best_model.pth,3714401,3714401
+efficientnetb0_unet_rgb_384_smallmask,True,,/kaggle/working/experiments_full/experiment6_smallmask_384/efficientnetb0_unet_rgb_384_smallmask/best_model.pth,6251469,6251469

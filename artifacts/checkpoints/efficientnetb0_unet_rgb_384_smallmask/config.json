@@ -1,0 +1,19 @@
+{
+  "name": "efficientnetb0_unet_rgb_384_smallmask",
+  "model_type": "unet",
+  "model_family": "parameter-efficient CNN transfer baseline",
+  "encoder_or_backbone": "efficientnet-b0",
+  "input_mode": "rgb",
+  "image_size": 384,
+  "classes": 1,
+  "encoder_weights": "imagenet",
+  "hf_model_name": null,
+  "pretrained": true,
+  "epochs": 40,
+  "learning_rate": 0.0001,
+  "weight_decay": 0.0001,
+  "use_pos_weight": true,
+  "use_small_mask_oversampling": false,
+  "use_small_mask_loss_weight": false,
+  "enabled": true
+}

@@ -119,13 +119,15 @@ class ModelSpec:
 class FinalAnalysisConfig:
     seed: int = 42
     batch_size: int = 4
-    num_workers: int = 2
+    num_workers: int = 0
+    pin_memory: bool = False
     use_amp: bool = True
     create_submission: bool = False
     save_probability_maps: bool = True
     max_visual_examples: int = 12
     bootstrap_iterations: int = 5000
     robustness_enabled: bool = True
+    reuse_existing_robustness_metrics: bool = True
     robustness_include_combined: bool = True
     component_iou_thresholds: Tuple[float, ...] = (0.10, 0.25, 0.50)
     degradation_order: Tuple[str, ...] = (
@@ -654,12 +656,23 @@ def load_npz_records(model_name: str, split_name: str, df: pd.DataFrame, image_s
     if meta_path.exists():
         meta = pd.read_csv(meta_path)
         if "image_id" in meta.columns and len(meta) == len(probs):
-            order = meta["image_id"].astype(str).tolist()
-            indexed = df_use.assign(image_id=df_use["image_id"].astype(str)).set_index("image_id", drop=False)
-            if all(image_id in indexed.index for image_id in order):
-                df_use = indexed.loc[order].reset_index(drop=True)
+            meta_order = meta.copy()
+            meta_order["image_id"] = meta_order["image_id"].astype(str)
+            df_tmp = df_use.copy()
+            df_tmp["image_id"] = df_tmp["image_id"].astype(str)
+
+            join_cols = ["image_id"]
+            if "class_name" in meta_order.columns and "class_name" in df_tmp.columns:
+                meta_order["class_name"] = meta_order["class_name"].astype(str)
+                df_tmp["class_name"] = df_tmp["class_name"].astype(str)
+                join_cols = ["image_id", "class_name"]
+
+            meta_order["_prob_order"] = np.arange(len(meta_order))
+            aligned = meta_order[join_cols + ["_prob_order"]].merge(df_tmp, on=join_cols, how="left", validate="one_to_one")
+            if len(aligned) == len(probs) and not aligned["image_path"].isna().any():
+                df_use = aligned.sort_values("_prob_order").drop(columns=["_prob_order"]).reset_index(drop=True)
             else:
-                print(f"[warn] {model_name} {split_name}: metadata image_id split ile tam eslesmedi, sirali eslestirme kullaniliyor.")
+                print(f"[warn] {model_name} {split_name}: metadata split ile birebir eslesmedi, sirali eslestirme kullaniliyor.")
                 df_use = df.iloc[: len(probs)].copy()
         else:
             df_use = df.iloc[: len(probs)].copy()
@@ -667,6 +680,9 @@ def load_npz_records(model_name: str, split_name: str, df: pd.DataFrame, image_s
         if len(probs) != len(df):
             print(f"[warn] {model_name} {split_name}: probs sayisi split ile eslesmiyor ({len(probs)} vs {len(df)}). Sirali eslestirme yapiliyor.")
         df_use = df.iloc[: len(probs)].copy()
+    if len(df_use) != len(probs):
+        print(f"[warn] {model_name} {split_name}: hizalanmis kayit sayisi {len(df_use)}, prob sayisi {len(probs)}. Ortak uzunluga kirpiliyor.")
+        df_use = df_use.iloc[: len(probs)].copy()
     records = make_records_from_df(df_use, image_size)
     for i, rec in enumerate(records):
         rec["prob"] = probs[i]
@@ -681,7 +697,7 @@ def load_npz_records(model_name: str, split_name: str, df: pd.DataFrame, image_s
 def run_inference_records(model: nn.Module, spec: ModelSpec, df: pd.DataFrame, degradation: str, save_prefix: Optional[Path]) -> Tuple[List[Dict[str, Any]], float]:
     ds = ForgeryEvalDataset(df, spec.image_size, degradation=degradation)
     batch_size = CFG.batch_size if spec.model_type == "segformer" else max(CFG.batch_size, 4)
-    loader = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=CFG.num_workers, pin_memory=DEVICE.type == "cuda")
+    loader = DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=CFG.num_workers, pin_memory=CFG.pin_memory)
     model.eval()
     records = make_records_from_df(df, spec.image_size)
     probs_all = []
@@ -718,6 +734,25 @@ def get_clean_records(model: Optional[nn.Module], spec: ModelSpec) -> Tuple[Opti
         return None, np.nan, "clean probability map ve checkpoint bulunamadi"
     records, inference_time = run_inference_records(model, spec, test_df, "clean_png", model_output_dir(spec.name) / "test_prob_maps")
     return records, inference_time, "inferred_from_checkpoint"
+
+
+def load_cached_degradation_records(spec: ModelSpec, degradation: str) -> Optional[List[Dict[str, Any]]]:
+    cache_path = model_output_dir(spec.name) / "robustness" / f"{degradation}_prob_maps.npz"
+    if not cache_path.exists():
+        return None
+    try:
+        data = np.load(cache_path, allow_pickle=True)
+        probs = data["probs"].astype(np.float32) if "probs" in data else data["arr_0"].astype(np.float32)
+    except Exception as exc:
+        print(f"[warn] Cache okunamadi, yeniden inference yapilacak: {cache_path} ({exc})")
+        return None
+    if len(probs) != len(test_df):
+        print(f"[warn] Cache uzunlugu split ile eslesmedi, yeniden inference yapilacak: {cache_path}")
+        return None
+    records = make_records_from_df(test_df, spec.image_size)
+    for i, rec in enumerate(records):
+        rec["prob"] = probs[i]
+    return records
 
 
 # %% [markdown]
@@ -979,8 +1014,7 @@ def pixel_metrics_from_records(records: List[Dict[str, Any]], preds: List[np.nda
 def per_image_metrics(records: List[Dict[str, Any]], preds: List[np.ndarray], scores: Sequence[float], image_threshold: float) -> pd.DataFrame:
     rows = []
     for rec, pred, score in zip(records, preds, scores):
-        is_authentic = int(rec.get("image_label", 0)) == 0 or str(rec.get("class_name", "")).lower() == "authentic"
-        gt = np.zeros_like(rec["mask"], dtype=np.uint8) if is_authentic else rec["mask"].astype(np.uint8)
+        gt = rec["mask"].astype(np.uint8)
         pred = pred.astype(np.uint8)
         rows.append(
             {
@@ -1309,55 +1343,75 @@ def robustness_metric_row(model_name: str, degradation: str, metrics: Dict[str, 
 
 robustness_rows = []
 robustness_errors = []
+existing_robustness_path = FINAL_ROOT / "robustness_metrics_all.csv"
+existing_robustness_delta_path = FINAL_ROOT / "robustness_delta_from_clean.csv"
 
-for spec in FINAL_MODELS:
-    selected = selected_configs_by_model.get(spec.name)
-    model = loaded_models.get(spec.name)
-    if selected is None:
-        continue
-    model_robust_rows = []
-    if spec.name in clean_outputs_by_model:
-        clean_metrics = clean_outputs_by_model[spec.name]["metrics"]
-        clean_time = clean_metrics.get("inference_time_per_image", np.nan)
-        clean_outputs_by_model[spec.name]["per_df"].to_csv(model_output_dir(spec.name) / "robustness_per_image_clean_png.csv", index=False)
-        row = robustness_metric_row(spec.name, "clean_png", clean_metrics, clean_time)
-        robustness_rows.append(row)
-        model_robust_rows.append(row)
-    if model is None:
-        robustness_errors.append({"model_name": spec.name, "message": "checkpoint bulunamadigi icin robustness calistirilamadi"})
-        print(f"[warn] {spec.name}: checkpoint yok, robustness atlandi.")
-        pd.DataFrame(model_robust_rows).to_csv(model_output_dir(spec.name) / "robustness_metrics.csv", index=False)
-        continue
-    degradations = [d for d in CFG.degradation_order if d != "clean_png"]
-    if not CFG.robustness_include_combined:
-        degradations = [d for d in degradations if not d.startswith("combined_")]
-    if not CFG.robustness_enabled:
-        degradations = []
-    for degradation in degradations:
-        try:
-            records, inference_time = run_inference_records(model, spec, test_df, degradation, model_output_dir(spec.name) / "robustness" / f"{degradation}_prob_maps")
-            metrics, per_df, small_df, comp_df, reliability_df, _ = evaluate_records(records, selected, inference_time)
-            per_df.to_csv(model_output_dir(spec.name) / f"robustness_per_image_{degradation}.csv", index=False)
-            small_df.to_csv(model_output_dir(spec.name) / "robustness" / f"small_mask_bins_{degradation}.csv", index=False)
-            comp_df.to_csv(model_output_dir(spec.name) / "robustness" / f"component_details_{degradation}.csv", index=False)
-            reliability_df.to_csv(model_output_dir(spec.name) / "robustness" / f"calibration_{degradation}.csv", index=False)
-            row = robustness_metric_row(spec.name, degradation, metrics, inference_time)
+if CFG.reuse_existing_robustness_metrics and existing_robustness_path.exists():
+    robustness_df = pd.read_csv(existing_robustness_path)
+    print(f"[cache] Existing robustness metrics kullanildi: {existing_robustness_path}")
+    for spec in FINAL_MODELS:
+        model_metrics = robustness_df[robustness_df["model_name"].astype(str) == spec.name]
+        if not model_metrics.empty:
+            model_metrics.to_csv(model_output_dir(spec.name) / "robustness_metrics.csv", index=False)
+        if spec.name in clean_outputs_by_model:
+            clean_outputs_by_model[spec.name]["per_df"].to_csv(model_output_dir(spec.name) / "robustness_per_image_clean_png.csv", index=False)
+else:
+    for spec in FINAL_MODELS:
+        selected = selected_configs_by_model.get(spec.name)
+        model = loaded_models.get(spec.name)
+        if selected is None:
+            continue
+        model_robust_rows = []
+        if spec.name in clean_outputs_by_model:
+            clean_metrics = clean_outputs_by_model[spec.name]["metrics"]
+            clean_time = clean_metrics.get("inference_time_per_image", np.nan)
+            clean_outputs_by_model[spec.name]["per_df"].to_csv(model_output_dir(spec.name) / "robustness_per_image_clean_png.csv", index=False)
+            row = robustness_metric_row(spec.name, "clean_png", clean_metrics, clean_time)
             robustness_rows.append(row)
             model_robust_rows.append(row)
-        except Exception as exc:
-            msg = f"{type(exc).__name__}: {exc}"
-            robustness_errors.append({"model_name": spec.name, "degradation": degradation, "message": msg})
-            print(f"[warn] robustness hata: {spec.name} {degradation}: {msg}")
-            if DEVICE.type == "cuda":
-                torch.cuda.empty_cache()
-    pd.DataFrame(model_robust_rows).to_csv(model_output_dir(spec.name) / "robustness_metrics.csv", index=False)
+        if model is None:
+            robustness_errors.append({"model_name": spec.name, "message": "checkpoint bulunamadigi icin robustness calistirilamadi"})
+            print(f"[warn] {spec.name}: checkpoint yok, robustness atlandi.")
+            pd.DataFrame(model_robust_rows).to_csv(model_output_dir(spec.name) / "robustness_metrics.csv", index=False)
+            continue
+        degradations = [d for d in CFG.degradation_order if d != "clean_png"]
+        if not CFG.robustness_include_combined:
+            degradations = [d for d in degradations if not d.startswith("combined_")]
+        if not CFG.robustness_enabled:
+            degradations = []
+        for degradation in degradations:
+            try:
+                cached_records = load_cached_degradation_records(spec, degradation)
+                if cached_records is not None:
+                    records, inference_time = cached_records, np.nan
+                    print(f"[cache] {spec.name} {degradation}: cached probability map kullanildi.")
+                else:
+                    records, inference_time = run_inference_records(model, spec, test_df, degradation, model_output_dir(spec.name) / "robustness" / f"{degradation}_prob_maps")
+                metrics, per_df, small_df, comp_df, reliability_df, _ = evaluate_records(records, selected, inference_time)
+                per_df.to_csv(model_output_dir(spec.name) / f"robustness_per_image_{degradation}.csv", index=False)
+                small_df.to_csv(model_output_dir(spec.name) / "robustness" / f"small_mask_bins_{degradation}.csv", index=False)
+                comp_df.to_csv(model_output_dir(spec.name) / "robustness" / f"component_details_{degradation}.csv", index=False)
+                reliability_df.to_csv(model_output_dir(spec.name) / "robustness" / f"calibration_{degradation}.csv", index=False)
+                row = robustness_metric_row(spec.name, degradation, metrics, inference_time)
+                robustness_rows.append(row)
+                model_robust_rows.append(row)
+            except Exception as exc:
+                msg = f"{type(exc).__name__}: {exc}"
+                robustness_errors.append({"model_name": spec.name, "degradation": degradation, "message": msg})
+                print(f"[warn] robustness hata: {spec.name} {degradation}: {msg}")
+                if DEVICE.type == "cuda":
+                    torch.cuda.empty_cache()
+        pd.DataFrame(model_robust_rows).to_csv(model_output_dir(spec.name) / "robustness_metrics.csv", index=False)
 
-robustness_df = pd.DataFrame(robustness_rows)
-robustness_df.to_csv(FINAL_ROOT / "robustness_metrics_all.csv", index=False)
-pd.DataFrame(robustness_errors).to_csv(FINAL_ROOT / "robustness_errors.csv", index=False)
+    robustness_df = pd.DataFrame(robustness_rows)
+    robustness_df.to_csv(FINAL_ROOT / "robustness_metrics_all.csv", index=False)
+    pd.DataFrame(robustness_errors).to_csv(FINAL_ROOT / "robustness_errors.csv", index=False)
 
 delta_rows = []
-if not robustness_df.empty:
+if CFG.reuse_existing_robustness_metrics and existing_robustness_delta_path.exists():
+    robustness_delta_df = pd.read_csv(existing_robustness_delta_path)
+    print(f"[cache] Existing robustness delta kullanildi: {existing_robustness_delta_path}")
+elif not robustness_df.empty:
     for model_name, part in robustness_df.groupby("model_name"):
         clean = part[part["degradation"] == "clean_png"]
         if clean.empty:
@@ -1368,8 +1422,11 @@ if not robustness_df.empty:
             for metric in ["forged_dice", "q1_dice", "component_f1_iou010", "authentic_fp_rate", "image_f1"]:
                 out[f"delta_{metric}"] = float(row.get(metric, np.nan)) - float(base.get(metric, np.nan))
             delta_rows.append(out)
-robustness_delta_df = pd.DataFrame(delta_rows)
-robustness_delta_df.to_csv(FINAL_ROOT / "robustness_delta_from_clean.csv", index=False)
+    robustness_delta_df = pd.DataFrame(delta_rows)
+    robustness_delta_df.to_csv(FINAL_ROOT / "robustness_delta_from_clean.csv", index=False)
+else:
+    robustness_delta_df = pd.DataFrame(delta_rows)
+    robustness_delta_df.to_csv(FINAL_ROOT / "robustness_delta_from_clean.csv", index=False)
 
 
 # %% [markdown]
@@ -1559,13 +1616,44 @@ def load_per_image_for_model(model_name: str, strategy: str) -> Optional[pd.Data
         return None
     df = pd.read_csv(path)
     df["image_id"] = df["image_id"].astype(str)
+    df = enrich_per_image_with_test_metadata(df, model_name, strategy)
     return df
+
+
+def enrich_per_image_with_test_metadata(df: pd.DataFrame, model_name: str, strategy: str) -> pd.DataFrame:
+    """Eski Deney 5 per-image CSV'lerinde eksik olan mask_quartile/class metadata'sini ekler."""
+    out = df.copy()
+    required = ["mask_quartile", "class_name", "gt_area", "gt_area_ratio"]
+    if all(col in out.columns for col in required):
+        return out
+
+    meta_cols = ["image_id", "class_name", "image_label", "gt_area", "gt_area_ratio", "mask_quartile", "image_path"]
+    meta = test_df[[c for c in meta_cols if c in test_df.columns]].copy()
+    meta["image_id"] = meta["image_id"].astype(str)
+
+    join_cols = ["image_id"]
+    if "class_name" in out.columns and "class_name" in meta.columns:
+        out["class_name"] = out["class_name"].astype(str)
+        meta["class_name"] = meta["class_name"].astype(str)
+        join_cols = ["image_id", "class_name"]
+
+    fill_cols = [c for c in meta.columns if c not in join_cols and c not in out.columns]
+    if not fill_cols:
+        return out
+
+    meta_small = meta[join_cols + fill_cols].drop_duplicates(subset=join_cols)
+    enriched = out.merge(meta_small, on=join_cols, how="left", validate="many_to_one")
+    if "mask_quartile" not in enriched.columns:
+        print(f"[warn] {model_name}/{strategy}: mask_quartile eklenemedi; Q1/Q2 istatistikleri atlanabilir.")
+    return enriched
 
 
 def paired_arrays(df_a: pd.DataFrame, df_b: pd.DataFrame, metric: str, subset: Optional[str] = None) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame]:
     a = df_a.copy()
     b = df_b.copy()
     if subset in ["Q1", "Q2", "Q3", "Q4"]:
+        if "mask_quartile" not in a.columns or "mask_quartile" not in b.columns:
+            return np.array([], dtype=float), np.array([], dtype=float), pd.DataFrame()
         a = a[(a["image_label"].astype(int) == 1) & (a["mask_quartile"].astype(str) == subset)]
         b = b[(b["image_label"].astype(int) == 1) & (b["mask_quartile"].astype(str) == subset)]
     elif subset == "forged":
@@ -1737,7 +1825,8 @@ def save_failure_grid(records: List[Dict[str, Any]], outputs: Dict[str, Any], se
         rec = records[idx]
         image = load_image_rgb(rec["image_path"])
         image = cv2.resize(image, (rec["prob"].shape[1], rec["prob"].shape[0]), interpolation=cv2.INTER_AREA)
-        gt = rec["mask"].astype(np.uint8)
+        is_authentic = int(rec.get("image_label", 0)) == 0 or str(rec.get("class_name", "")).lower() == "authentic"
+        gt = np.zeros_like(rec["mask"], dtype=np.uint8) if is_authentic else rec["mask"].astype(np.uint8)
         prob = rec["prob"].astype(np.float32)
         raw = outputs["raw_preds"][idx].astype(np.uint8)
         pred = outputs["preds"][idx].astype(np.uint8)

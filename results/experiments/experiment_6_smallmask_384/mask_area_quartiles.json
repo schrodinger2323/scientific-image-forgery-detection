@@ -1,0 +1,44 @@
+{
+  "train": {
+    "split": "train",
+    "thresholds": {
+      "q1_max_area": 2637.0,
+      "q2_max_area": 7753.0,
+      "q3_max_area": 29648.0
+    },
+    "counts": {
+      "Q1": 482,
+      "Q4": 481,
+      "Q3": 481,
+      "Q2": 481
+    }
+  },
+  "val": {
+    "split": "val",
+    "thresholds": {
+      "q1_max_area": 2451.0,
+      "q2_max_area": 6821.0,
+      "q3_max_area": 32990.5
+    },
+    "counts": {
+      "Q2": 69,
+      "Q4": 69,
+      "Q1": 69,
+      "Q3": 68
+    }
+  },
+  "test": {
+    "split": "test",
+    "thresholds": {
+      "q1_max_area": 2493.0,
+      "q2_max_area": 8387.0,
+      "q3_max_area": 30102.5
+    },
+    "counts": {
+      "Q1": 138,
+      "Q4": 138,
+      "Q2": 138,
+      "Q3": 137
+    }
+  }
+}

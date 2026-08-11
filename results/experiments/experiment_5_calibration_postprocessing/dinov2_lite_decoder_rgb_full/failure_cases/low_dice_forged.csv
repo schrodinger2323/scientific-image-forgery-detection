@@ -1,0 +1,11 @@
+image_id,image_path,class_name,gt_area,gt_area_ratio,pred_area,pred_area_ratio,dice,iou,image_score,image_pred_label,gt_component_count,pred_component_count,matched_component_count
+633,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/633.png,forged,22098,0.337188720703125,0,0.0,4.525296406894174e-12,4.525296406894174e-12,0.95654296875,1,12,0,0
+2177,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/2177.png,forged,19878,0.303314208984375,0,0.0,5.030687191845101e-12,5.030687191845101e-12,0.7626953125,1,2,0,0
+286,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/286.png,forged,19870,0.303192138671875,0,0.0,5.0327126320833776e-12,5.0327126320833776e-12,0.841796875,1,7,0,0
+298,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/298.png,forged,19769,0.3016510009765625,0,0.0,5.058424806489663e-12,5.058424806489663e-12,0.4501953125,1,6,0,0
+187,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/187.png,forged,15313,0.2336578369140625,0,0.0,6.530399007336704e-12,6.530399007336704e-12,0.392822265625,1,14,0,0
+770,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/770.png,forged,13023,0.1987152099609375,0,0.0,7.67872226055687e-12,7.67872226055687e-12,0.90673828125,1,7,0,0
+65311,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/65311.png,forged,12695,0.1937103271484375,0,0.0,7.877116975125032e-12,7.877116975125032e-12,0.95361328125,1,2,0,0
+4371,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/4371.png,forged,11795,0.1799774169921875,717,0.0109405517578125,7.992327365665023e-12,7.992327365665023e-12,0.9375,1,1,1,0
+4992,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/4992.png,forged,12215,0.1863861083984375,0,0.0,8.186655751058642e-12,8.186655751058642e-12,0.8359375,1,5,0,0
+2534,/kaggle/input/competitions/recodai-luc-scientific-image-forgery-detection/train_images/forged/2534.png,forged,10515,0.1604461669921875,0,0.0,9.510223490161576e-12,9.510223490161576e-12,0.9541015625,1,6,0,0

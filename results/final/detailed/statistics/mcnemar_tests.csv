@@ -1,0 +1,6 @@
+comparison,metric,n,a_correct_b_wrong,a_wrong_b_correct,mcnemar_p
+segformer_b0_rgb_384_smallmask vs efficientnetb0_unet_rgb_384_smallmask,image_correctness,1967,284,418,4.794197293825312e-07
+segformer_b0_rgb_384_smallmask vs segformer_b0_rgb_full,image_correctness,1967,454,347,0.00017652854915824
+efficientnetb0_unet_rgb_384_smallmask vs efficientnetb0_unet_rgb_full,image_correctness,1967,442,267,5.118238750959813e-11
+segformer_b0_rgb_384_smallmask vs unetpp_resnet34_rgb_full,image_correctness,1967,454,358,0.0008458923796532548
+efficientnetb0_unet_rgb_384_smallmask vs unetpp_resnet34_rgb_full,image_correctness,1967,505,275,1.4638216003561897e-16

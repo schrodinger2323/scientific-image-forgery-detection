@@ -1,0 +1,17 @@
+{
+  "best_threshold": 0.75,
+  "image_accuracy": 0.5166666666666667,
+  "image_f1": 0.09375,
+  "image_precision": 0.75,
+  "image_recall_sensitivity": 0.05,
+  "image_roc_auc": 0.4475,
+  "image_specificity": 0.9833333333333333,
+  "model_name": "plain_unet",
+  "pixel_dice": 0.49769362801401507,
+  "pixel_f1": 0.49769362801401507,
+  "pixel_iou": 0.49534917898793834,
+  "pixel_precision": 0.4962192819978849,
+  "pixel_recall": 0.5091899065717206,
+  "pixel_specificity": 0.9980875605469016,
+  "threshold": 0.75
+}

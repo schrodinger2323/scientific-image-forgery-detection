@@ -1,0 +1,2 @@
+dice,iou,precision,recall,specificity,f1,auprc,boundary_f1,image_level_accuracy,image_level_precision,image_level_recall,image_level_f1,threshold,inference_mode,split,experiment_name
+0.5081494001457998,0.3406168152464206,0.41568035807353715,0.6535282465376423,0.9737254663768926,0.5081494001457998,0.5684373308504915,0.21686027629145163,0.6563106796116505,0.6361111111111111,0.8327272727272728,0.721259842519685,0.9,surface,validation,unetpp_resnet34_rgb_baseline

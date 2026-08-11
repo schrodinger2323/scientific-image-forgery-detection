@@ -1,0 +1,17 @@
+{
+  "experiment_name": "unetpp_resnet50_rgb_srm_edge_multitask",
+  "input_mode": "rgb_srm",
+  "encoder": "resnet50",
+  "primary_inference_mode": "edge_enhanced",
+  "best_epoch": 14,
+  "selected_threshold": 0.9,
+  "val_dice": 0.45732051273736624,
+  "val_iou": 0.2964455783027532,
+  "test_dice": 0.4524844046177457,
+  "test_iou": 0.29239408376106013,
+  "test_precision": 0.3735136199445948,
+  "test_recall": 0.5738013887911602,
+  "test_auprc": 0.3562747554774326,
+  "image_level_f1": 0.7028169014084507,
+  "boundary_f1": 0.27028405994284493
+}

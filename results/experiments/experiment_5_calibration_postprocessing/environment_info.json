@@ -1,0 +1,10 @@
+{
+  "python": "3.12.12 (main, Oct 10 2025, 08:52:57) [GCC 11.4.0]",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+  "torch": "2.10.0+cu128",
+  "cuda_available": true,
+  "cuda_device": "Tesla T4",
+  "numpy": "2.0.2",
+  "pandas": "2.3.3",
+  "opencv": "4.13.0"
+}
