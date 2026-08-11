@@ -1,0 +1,7 @@
+split,count,authentic,forged
+train,3590,1665,1925
+val,515,240,275
+test,1023,472,551
+leak_train_val,0,0,0
+leak_train_test,0,0,0
+leak_val_test,0,0,0

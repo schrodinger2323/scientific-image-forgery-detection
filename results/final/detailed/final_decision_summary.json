@@ -1,0 +1,7 @@
+{
+  "primary_localization_model": "segformer_b0_rgb_384_smallmask",
+  "primary_localization_label": "Localization-oriented final model",
+  "conservative_model": "efficientnetb0_unet_rgb_384_smallmask",
+  "conservative_label": "Conservative low-false-alarm final model",
+  "decision_sentence": "Eger ana hedef piksel/bilesen lokalizasyon basarisiysa final model SegFormer-B0 384'tur; eger pratik kullanimda dusuk yanlis alarm ve goruntu duzeyi guvenilirlik oncelikliyse final model EfficientNetB0-UNet 384'tur. Tezde iki model birlikte raporlanmalidir."
+}

@@ -1,0 +1,17 @@
+{
+  "experiment_name": "unetpp_resnet34_rgb_baseline",
+  "input_mode": "rgb",
+  "encoder": "resnet34",
+  "primary_inference_mode": "surface",
+  "best_epoch": 38,
+  "selected_threshold": 0.9,
+  "val_dice": 0.5081494001457998,
+  "val_iou": 0.3406168152464206,
+  "test_dice": 0.525873570769389,
+  "test_iou": 0.35673573198457437,
+  "test_precision": 0.4304245267921588,
+  "test_recall": 0.6757177598456113,
+  "test_auprc": 0.5806530567599394,
+  "image_level_f1": 0.7410926365795725,
+  "boundary_f1": 0.19952586119327023
+}

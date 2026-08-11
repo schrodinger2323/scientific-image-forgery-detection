@@ -1,0 +1,84 @@
+{
+  "experiment_name": "deney_2_pilot_seed_stability",
+  "dataset_root": "\\content\\drive\\MyDrive\\bitirmeProjesi\\dataset",
+  "output_base": "C:\\Users\\asus\\Documents\\bitirmeProjesi\\bitirmeProjesi\\deney_2",
+  "seeds": [
+    42,
+    123,
+    2025
+  ],
+  "models": [
+    "plain_unet",
+    "unetplusplus",
+    "efficientnetb0_unet",
+    "deeplabv3plus",
+    "segformer_b0"
+  ],
+  "samples_per_class": 300,
+  "image_size": 256,
+  "batch_size": 8,
+  "max_epochs": 40,
+  "learning_rate": 0.0001,
+  "optimizer": "adamw",
+  "early_stopping_patience": 8,
+  "reduce_lr_patience": 4,
+  "reduce_lr_factor": 0.3,
+  "threshold_values": [
+    0.1,
+    0.15,
+    0.2,
+    0.25,
+    0.3,
+    0.35,
+    0.4,
+    0.45,
+    0.5,
+    0.55,
+    0.6,
+    0.65,
+    0.7,
+    0.75,
+    0.8,
+    0.85,
+    0.9
+  ],
+  "image_decision_mode": "max_probability",
+  "split": "60/20/20 stratified group-aware split",
+  "group_column": "image_id/group_id",
+  "subset_policy": "fixed_subset_index=\\content\\drive\\MyDrive\\bitirmeProjesi\\_shared_splits_seed42_subset\\full_dataset_index.csv; the exact rows in this CSV are reused for all split seeds",
+  "fixed_subset_seed": null,
+  "fixed_subset_index": "\\content\\drive\\MyDrive\\bitirmeProjesi\\_shared_splits_seed42_subset\\full_dataset_index.csv",
+  "preprocessing": [
+    "Images are resized to img_size x img_size.",
+    "Authentic images receive all-zero masks.",
+    "Forged .npy masks are converted to binary masks.",
+    "Multi-channel forged masks are reduced with np.any(mask > 0, axis=0).",
+    "Keras models use model-specific preprocessing; PyTorch models use ImageNet mean/std normalization."
+  ],
+  "augmentation": [
+    "Applied only to train split.",
+    "Horizontal flip with p=0.5.",
+    "Vertical flip with p=0.5.",
+    "Random 90-degree rotation.",
+    "Brightness/contrast jitter with alpha in [0.85, 1.15] and beta in [-18, 18]."
+  ],
+  "losses_and_selection": [
+    "Keras segmentation loss: 0.5 * BCE + 0.5 * Dice loss.",
+    "PyTorch primary segmentation loss: BCEWithLogits + Dice loss.",
+    "PyTorch forensic heads may add edge/aux/image losses when the model exposes them.",
+    "Best checkpoint is selected by validation Dice.",
+    "Threshold is tuned only on val-tune; internal-test is never used for threshold selection."
+  ],
+  "fairness_controls": [
+    "Use --fixed-subset-index to reuse the exact first-experiment 300+300 subset.",
+    "Within each seed folder, all models reuse the same generated split CSV files.",
+    "All hyperparameters are kept at the first-pilot defaults unless explicitly overridden in the command.",
+    "The only intended varying factor across seed folders is the seed-driven split/training randomness."
+  ],
+  "notes": [
+    "All models within the same pilot_seed_<seed> folder reuse the same split CSV files.",
+    "Kaggle test_images are only used for submission generation, not for threshold tuning or internal testing.",
+    "Primary localization stability metric is forged-only pixel F1/IoU, because all-image pixel means can be inflated by authentic all-zero masks.",
+    "For strict comparison against the previous single-seed pilot, compare the new seed=42 rerun produced by this script under the same code revision."
+  ]
+}

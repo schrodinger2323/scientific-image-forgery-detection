@@ -1,0 +1,17 @@
+{
+  "best_threshold": 0.85,
+  "image_accuracy": 0.48333333333333334,
+  "image_f1": 0.11428571428571428,
+  "image_precision": 0.4,
+  "image_recall_sensitivity": 0.06666666666666667,
+  "image_roc_auc": 0.5361111111111111,
+  "image_specificity": 0.9,
+  "model_name": "deeplabv3plus",
+  "pixel_dice": 0.46594809958094113,
+  "pixel_f1": 0.46594809958094113,
+  "pixel_iou": 0.46063349649148494,
+  "pixel_precision": 0.4706933016124245,
+  "pixel_recall": 0.5152948744349368,
+  "pixel_specificity": 0.9968947250826259,
+  "threshold": 0.85
+}

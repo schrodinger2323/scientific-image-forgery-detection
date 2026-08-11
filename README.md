@@ -2,7 +2,7 @@
 
 Reproducible deep-learning experiments for detecting and localizing copy-move manipulation in biomedical research images. The project was developed for the **Recod.ai/LUC Scientific Image Forgery Detection** dataset and evaluates both pixel-level localization and image-level forgery detection.
 
-The repository is a compact, GitHub-ready archive of the graduation project. Datasets, model checkpoints, prediction tensors, and repeated raw experiment folders are intentionally excluded; the source code, clean notebooks, final tables, plots, and experimental report are retained.
+The repository is a GitHub-ready archive of the graduation project. Source code, clean notebooks, exact split manifests, detailed experiment tables, final plots and reports, and the two selected final model checkpoints are retained. Redistributable datasets, raw probability tensors, superseded checkpoints, and repeated working folders are intentionally excluded.
 
 ## Highlights
 
@@ -46,9 +46,12 @@ Small forged regions remain the hardest cases, although 384×384 training substa
 ├── scripts/                    # CLI entry points for model families and comparisons
 ├── experiments/                # Standalone Kaggle/Colab experiment programs
 ├── notebooks/                  # Output-free notebooks ordered by study stage
+├── artifacts/checkpoints/      # Two selected final model weights and configs
 ├── results/
 │   ├── eda/                    # Dataset summary tables
-│   └── final/                  # Final metrics, statistical tests and plots
+│   ├── experiments/            # Detailed CSV/JSON/Markdown results for experiments 2–6
+│   ├── splits/                 # Exact seed-42 full-data split manifests
+│   └── final/                  # Final metrics, per-image details, tests and plots
 └── docs/
     ├── workflows/              # Step-by-step records for experiments 1–6
     └── final_experimental_report.md
@@ -137,9 +140,12 @@ The complete narrative and limitations are documented in [`docs/final_experiment
 
 - The main full-data split uses seed 42 and contains 3,590 training, 515 validation, and 1,023 test images.
 - No image identity overlaps between these splits.
-- Model weights are excluded because individual checkpoints are hundreds of megabytes and can be regenerated from the included code.
-- Exact final metrics and configurations are preserved under [`results/final/`](results/final/).
+- The selected SegFormer-B0 and EfficientNetB0-UNet weights are preserved under [`artifacts/checkpoints/`](artifacts/checkpoints/), together with their configs and SHA-256 checksums.
+- Exact split membership is preserved under [`results/splits/full_seed42/`](results/splits/full_seed42/).
+- Detailed experiment results are preserved under [`results/experiments/`](results/experiments/), with final per-image and robustness tables under [`results/final/detailed/`](results/final/detailed/).
 - The notebooks contain no execution outputs or embedded credentials.
+
+See [`ARCHIVE_MANIFEST.md`](ARCHIVE_MANIFEST.md) for the deletion-safety audit, artifact hashes, and the explicit list of large reproducible files that were not archived.
 
 ## Scope and limitations
 

@@ -40,6 +40,11 @@ wandb/
 *.npz
 *.npy
 
+# Keep only the two explicitly archived final checkpoints.
+!artifacts/checkpoints/
+!artifacts/checkpoints/**/
+!artifacts/checkpoints/**/best_model.pth
+
 # Archives and temporary files
 *.zip
 *.7z
@@ -49,4 +54,3 @@ wandb/
 *.log
 *.tmp
 ~$*
-

@@ -1,0 +1,28 @@
+{
+  "n_models_attempted": 4,
+  "n_models_completed": 4,
+  "n_selected_configs": 20,
+  "n_test_rows": 24,
+  "best_candidate": {
+    "rank": 1,
+    "model_name": "segformer_b0_rgb_full",
+    "strategy": "low_false_alarm",
+    "postprocess_mode": "morph_area_probability_clean",
+    "pixel_threshold": 0.75,
+    "image_score_type": "max_probability",
+    "image_threshold": 0.53884765625,
+    "min_component_area": 500,
+    "min_component_mean_probability": 0.0,
+    "test_dice_forged_only": 0.5572968914104983,
+    "test_iou_forged_only": 0.386286608861164,
+    "test_component_f1_iou010": 0.32626661875673735,
+    "test_component_f1_iou025": 0.30398850161696017,
+    "test_image_f1": 0.7292110874200426,
+    "test_image_specificity": 0.2733050847457627,
+    "authentic_fp_rate": 0.24364406779661016,
+    "final_score": 0.5737339706075452
+  },
+  "errors": [],
+  "run_robustness": false,
+  "n_robustness_rows": 0
+}

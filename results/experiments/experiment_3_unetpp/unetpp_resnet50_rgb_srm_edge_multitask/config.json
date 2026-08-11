@@ -1,0 +1,38 @@
+{
+  "global": {
+    "dataset_root": "/kaggle/input/datasets/koushikkumardinda/scientific-image-forgery-detection/recodai-luc-scientific-image-forgery-detection",
+    "experiments_root": "/kaggle/working/experiments",
+    "seed": 42,
+    "image_size": 256,
+    "batch_size": 8,
+    "num_workers": 0,
+    "epochs": 40,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.0001,
+    "patience": 8,
+    "reduce_lr_patience": 3,
+    "reduce_lr_factor": 0.5,
+    "threshold_start": 0.1,
+    "threshold_end": 0.91,
+    "threshold_step": 0.05,
+    "edge_loss_weight": 0.4,
+    "edge_enhance_weight": 0.2,
+    "image_level_area_threshold": 0.001,
+    "pos_weight_max": 50.0,
+    "edge_pos_weight_max": 80.0,
+    "pos_weight_scan_samples": 700,
+    "use_compression_aug": false,
+    "run_robustness": false,
+    "use_amp": true
+  },
+  "experiment": {
+    "name": "unetpp_resnet50_rgb_srm_edge_multitask",
+    "model_name": "UnetPlusPlus",
+    "encoder_name": "resnet50",
+    "input_mode": "rgb_srm",
+    "output_channels": 2,
+    "encoder_weights": "imagenet",
+    "run": true,
+    "primary_inference_mode": "edge_enhanced"
+  }
+}

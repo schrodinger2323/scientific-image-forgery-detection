@@ -1,0 +1,9 @@
+model_name,split,loaded_from,status,n_records,message
+unetpp_resnet34_rgb_full,val,/kaggle/working/deney_4/experiments_4_full/unetpp_resnet34_rgb_full/val_predictions_probs.npz,loaded_npz,515,Prediction probability cache yuklendi.
+unetpp_resnet34_rgb_full,test,/kaggle/working/deney_4/experiments_4_full/unetpp_resnet34_rgb_full/test_predictions_probs.npz,loaded_npz,1023,Prediction probability cache yuklendi.
+efficientnetb0_unet_rgb_full,val,/kaggle/working/deney_4/experiments_4_full/efficientnetb0_unet_rgb_full/val_predictions_probs.npz,loaded_npz,515,Prediction probability cache yuklendi.
+efficientnetb0_unet_rgb_full,test,/kaggle/working/deney_4/experiments_4_full/efficientnetb0_unet_rgb_full/test_predictions_probs.npz,loaded_npz,1023,Prediction probability cache yuklendi.
+segformer_b0_rgb_full,val,/kaggle/working/deney_4/experiments_4_full/segformer_b0_rgb_full/val_predictions_probs.npz,loaded_npz,515,Prediction probability cache yuklendi.
+segformer_b0_rgb_full,test,/kaggle/working/deney_4/experiments_4_full/segformer_b0_rgb_full/test_predictions_probs.npz,loaded_npz,1023,Prediction probability cache yuklendi.
+dinov2_lite_decoder_rgb_full,val,/kaggle/working/deney_4/experiments_4_full/dinov2_lite_decoder_rgb_full/val_predictions_probs.npz,loaded_npz,515,Prediction probability cache yuklendi.
+dinov2_lite_decoder_rgb_full,test,/kaggle/working/deney_4/experiments_4_full/dinov2_lite_decoder_rgb_full/test_predictions_probs.npz,loaded_npz,1023,Prediction probability cache yuklendi.

@@ -1,0 +1,17 @@
+{
+  "best_threshold": 0.9,
+  "image_accuracy": 0.5983606557377049,
+  "image_f1": 0.6573426573426573,
+  "image_precision": 0.5465116279069767,
+  "image_recall_sensitivity": 0.8245614035087719,
+  "image_roc_auc": 0.7219973009446694,
+  "image_specificity": 0.4,
+  "model_name": "segformer_b0",
+  "pixel_dice": 0.36549035012127984,
+  "pixel_f1": 0.36549035012127984,
+  "pixel_iou": 0.31783590732564937,
+  "pixel_precision": 0.48396587275460373,
+  "pixel_recall": 0.6516944210512771,
+  "pixel_specificity": 0.9885393593836295,
+  "threshold": 0.9
+}
